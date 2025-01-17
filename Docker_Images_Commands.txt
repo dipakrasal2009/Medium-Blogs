@@ -1,0 +1,72 @@
+In this blog i write all commands to operate the docker image
+
+1) Build an image from a Dockerfile : using the docker file we can create our custome image.
+>docker build -t image_name_path_to_Dockerfile
+
+#example
+
+>docker build -t myapp .
+
+2)List all local images : this commands shows all downloaded docker images.
+
+>docker images or docker image ls
+
+3) Pull an image from docker hub : docker pull command is use to downloade the docker images from the docker hub.
+
+>docker pull image_name:tag
+
+#example
+
+>docker pull ubuntu:latest
+
+4) To remove the local docker image : this commands is use to remove the downloaded images from the local system.
+
+> docker rmi image_name:tag or docker rm [image_name/image_id]
+
+#example
+
+> docker rmi ubuntu:latest or docker rm fd248736284f
+
+5) Tag an image : using this command we can add the tag of the perticular image. means update the version of the image
+
+>docker tag source_image:taf new_image:tag
+
+# example]
+
+>docker tag ubuntu:latest ubuntu:v1
+
+6) Push an image to Docker hub : using this command we can push our custom image to the docker hub.
+
+>docker push image_name:tag
+
+#example
+
+> docker push ubuntu:v1
+
+7) Inspect details of an image : Using this command we can see al information of the image. it give details to you
+
+> doker image inspect image_name:tag
+
+#example
+
+>docker image inspect ubuntu:v1
+
+8) save an image to the tar archive :
+
+> docker save -o image_name.tar image_naem:tag
+
+#example
+
+> docker save -o ubuntu.tar ubuntu:v1
+
+9) Load an image from the tar archive :
+
+>docker load -i image_name.tar
+
+#example
+
+>docker load -i ubuntu.tar
+
+10) Prune unused image :
+
+>docker image prune
