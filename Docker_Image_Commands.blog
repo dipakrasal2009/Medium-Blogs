@@ -116,4 +116,8 @@ docker image prune
 This is an effective way to maintain a clean and efficient Docker environment. You can also use the -a option to remove all unused images.
 
 ---
+11. Create the new image using Docker commit command
 
+we can create the custome image 
+command : 
+docker commit <new_Image_Name> <Old_image_name>
