@@ -1,0 +1,89 @@
+How to Set Up Minikube on Ubuntu with Docker Driver
+----------------------------------------------------------
+If you want to explore Kubernetes on your local machine, Minikube is the perfect solution. It allows you to run a single-node Kubernetes cluster, making it ideal for development and testing. In this blog, we will walk through the step-by-step process of setting up Minikube on an Ubuntu system using Docker as the driver.
+
+---
+
+Prerequisites:
+Before you begin, make sure you have:
+Ubuntu installed on your machine.
+Docker installed and running. (If not, you can install Docker from here).
+kubectl installed to interact with the Kubernetes cluster. (Install it using: sudo apt install -y kubectl)
+
+---
+
+Step 1: Download the Minikube Package
+To get started, download the latest Minikube binary using the curl command:
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+This command fetches the latest Minikube release for Linux.
+
+---
+
+Step 2: Install Minikube
+After downloading, install Minikube by moving the binary to your system's executable path:
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+This command ensures you can run minikube from any terminal window.
+
+---
+
+Step 3: Verify the Installation
+Check if Minikube is installed correctly by verifying the version:
+minikube version
+You should see the installed version of Minikube displayed in the terminal.
+
+---
+
+Step 4: Start Minikube with Docker Driver
+Start Minikube using Docker as the driver:
+minikube start --driver=docker
+This command initializes a single-node Kubernetes cluster using Docker as the underlying container runtime.
+
+---
+
+Step 5: Check Minikube Status
+Verify if Minikube is running successfully:
+minikube status
+You should see output indicating that the cluster components are running.
+
+---
+
+Step 6: Display Cluster Information
+Use kubectl to check cluster details:
+kubectl cluster-info
+This will show URLs to access the Kubernetes control plane and other services.
+
+---
+
+Step 7: View Kubernetes Configuration
+To inspect your Kubernetes configuration, run:
+kubectl config view
+This command displays the current contexts and configurations.
+
+---
+
+Step 8: Check Running Nodes
+Ensure that the Kubernetes node is active:
+kubectl get nodes
+You should see a single node with the status Ready.
+
+---
+
+Step 9: Check Running Pods
+To view the pods running in the cluster:
+kubectl get pods
+Initially, you might not see any pods unless you deploy applications.
+
+---
+
+Step 10: Launch the Minikube Dashboard
+Minikube provides a handy dashboard to manage resources visually:
+minikube dashboard
+This command opens the Kubernetes dashboard in your default browser. (If you use Chrome, it will open in a new tab.)
+
+---
+
+Conclusion:
+Congratulations! 🎉 You've successfully set up Minikube on Ubuntu using Docker as the driver. With this setup, you can now start experimenting with Kubernetes resources like deployments, services, and pods in a local environment.
+If you found this guide helpful, don't forget to share it with others who might benefit.🚀
+
+---
