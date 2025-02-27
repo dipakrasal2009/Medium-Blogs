@@ -1,0 +1,126 @@
+Top 20 Kubectl Commands Every DevOps Engineer Should Know
+
+Introduction
+Kubernetes has transformed container orchestration, enabling developers and DevOps engineers to efficiently manage, deploy, and scale applications. At the core of Kubernetes is kubectl, the command-line tool that allows seamless interaction with clusters.
+In this blog, we will explore the top 20 kubectl commands that every DevOps engineer should know. Mastering these commands will help you navigate and control Kubernetes clusters effortlessly.
+
+Prerequisites:
+Before diving into the commands, ensure you have the following prerequisites in place:
+
+1. Kubernetes Cluster: Set up a functional Kubernetes cluster. For local testing, you can use Minikube or Docker Desktop with Kubernetes enabled.
+2. Install kubectl: Download and install kubectl to interact with your Kubernetes cluster. You can find installation instructions in the Kubernetes documentation.
+
+Now, let's get started with the essential kubectl commands:
+
+1. kubectl version:
+Check the client and server version of kubectl and the Kubernetes cluster to ensure compatibility and connectivity.
+Example:
+kubectl version
+
+2. kubectl cluster-info:
+Obtain essential information about the Kubernetes cluster, including its endpoints and master node details.
+Example:
+kubectl cluster-info
+
+3. kubectl get nodes:
+View the list of worker nodes in the cluster along with their statuses.
+Example:
+kubectl get nodes
+
+4. kubectl get pods:
+List all pods running in the current namespace.
+Example:
+kubectl get pods
+
+5. kubectl describe pods:
+Get detailed information about a specific pod, including its events, containers, and configurations.
+Example:
+kubectl describe pod <pod_name>
+
+6. kubectl logs:
+Retrieve logs from a running container within a pod.
+Example:
+kubectl logs <pod_name> <container_name>
+
+7. kubectl exec:
+Execute commands directly inside a container in a pod.
+Example (Run a shell in a specific container):
+kubectl exec -it <pod_name> -c <container_name> -- /bin/sh
+
+8. kubectl apply:
+Apply changes in a Kubernetes YAML configuration file to the cluster.
+Example:
+kubectl apply -f <file_path>
+
+9. kubectl delete:
+Delete a resource defined in a YAML file or directly by name.
+Example (Delete a pod):
+kubectl delete pod <pod_name>
+
+10. kubectl scale:
+Scale the number of replicas for a Deployment, ReplicationController, or StatefulSet.
+Example (Scale a Deployment to 3 replicas):
+kubectl scale deployment <deployment_name> --replicas=3
+
+11. kubectl get deployments:
+List all deployments running in the current namespace.
+Example:
+kubectl get deployments
+
+12. kubectl get services:
+Retrieve the list of services running in the current namespace.
+Example:
+kubectl get services
+
+13. kubectl expose:
+Expose a Deployment, ReplicaSet, or Pod as a Service.
+Example (Expose a Deployment as a NodePort service):
+kubectl expose deployment <deployment_name> --type=NodePort --port=<port_number>
+
+14. kubectl get namespaces:
+List all namespaces available in the cluster.
+Example:
+kubectl get namespaces
+
+15. kubectl create namespace:
+Create a new namespace.
+Example:
+kubectl create namespace <namespace_name>
+
+16. kubectl config get-contexts:
+List all available contexts (clusters, users, and namespaces) in your kubeconfig file.
+Example:
+kubectl config get-contexts
+
+17. kubectl config use-context:
+Switch between different contexts.
+Example:
+kubectl config use-context <context_name>
+
+18. kubectl rollout:
+Manage rollouts and updates for Deployments.
+Example (Check rollout status for a Deployment):
+kubectl rollout status deployment/<deployment_name>
+
+19. kubectl apply -f -:
+Apply configurations from standard input without creating a YAML file.
+Example:
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: nginx
+EOF
+
+20. kubectl taint:
+Taint a node to repel certain pods unless they tolerate the taint.
+Example (Taint a node with a key=value taint):
+kubectl taint nodes <node_name> key=value:taint_effect
+
+Conclusion:
+By mastering these top 20 kubectl commands, you are well-equipped to handle various Kubernetes management tasks with ease. The ability to interact efficiently with your Kubernetes clusters is essential for any DevOps engineer, enabling seamless application deployment and scaling while ensuring optimal performance and availability. Keep exploring the Kubernetes documentation and experiment with these commands in your test environment to gain practical experience and confidence in managing your production Kubernetes clusters. 
+Happy Kubernetting!
