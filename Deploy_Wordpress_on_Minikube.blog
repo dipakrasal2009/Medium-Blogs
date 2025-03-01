@@ -1,0 +1,234 @@
+Deploying WordPress on Kubernetes Minikube Using WordPress and MySQL Docker Images
+
+Introduction
+Kubernetes is a powerful tool for container orchestration, and Minikube allows us to run a local Kubernetes cluster for development and testing. In this guide, we will deploy WordPress on Kubernetes Minikube using official WordPress and MySQL Docker images.
+This step-by-step guide is designed for everyone, whether you're a beginner or an experienced DevOps engineer. Let's get started!
+Prerequisites
+Before starting, make sure you have the following installed on your system:
+Minikube
+Kubectl
+Docker
+
+---
+
+Step 1: Start Minikube
+First, ensure you have Minikube installed. If not, install it from the official Minikube documentation.
+Start Minikube using the following command:
+minikube start
+This command initializes a Kubernetes cluster on your local machine.
+
+---
+
+Step 2: Create a Namespace
+Namespaces help to keep resources organized. Create a namespace for WordPress:
+kubectl create namespace wordpress
+
+---
+
+Step 3: Create Persistent Volumes for MySQL and WordPress
+Since both WordPress and MySQL require persistent storage, define PersistentVolumes (PV) and PersistentVolumeClaims (PVC).
+Create a file mysql-pv.yaml:
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+  namespace: wordpress
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/mysql"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+Apply it:
+kubectl apply -f mysql-pv.yaml
+Similarly, create wordpress-pv.yaml for WordPress storage:
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wordpress-pv
+  namespace: wordpress
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/wordpress"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress-pvc
+  namespace: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+Apply it:
+kubectl apply -f wordpress-pv.yaml
+
+---
+
+Step 4: Deploy MySQL
+Now, deploy MySQL using Kubernetes Deployment and Service.
+mysql-deployment.yaml (MySQL Deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "rootpassword"
+        - name: MYSQL_DATABASE
+          value: "wordpress"
+        - name: MYSQL_USER
+          value: "wpuser"
+        - name: MYSQL_PASSWORD
+          value: "wppassword"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+Apply the deployment:
+kubectl apply -f mysql-deployment.yaml
+
+---
+
+Step 5: Deploy WordPress
+Now, deploy the WordPress application.
+wordpress-deployment.yaml (WordPress Deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - name: wordpress
+        image: wordpress:latest
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: "mysql"
+        - name: WORDPRESS_DB_USER
+          value: "wpuser"
+        - name: WORDPRESS_DB_PASSWORD
+          value: "wppassword"
+        - name: WORDPRESS_DB_NAME
+          value: "wordpress"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: wordpress-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: wordpress-storage
+        persistentVolumeClaim:
+          claimName: wordpress-pvc
+Apply it:
+kubectl apply -f wordpress-deployment.yaml
+
+---
+
+Step 6: Create Services
+We need two services: one for MySQL (ClusterIP) and one for WordPress (NodePort).
+Create services.yaml:
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: wordpress
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  namespace: wordpress
+spec:
+  type: NodePort
+  selector:
+    app: wordpress
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
+Apply it:
+kubectl apply -f services.yaml
+
+---
+
+Step 7: Verify the Deployment
+Check if pods are running:
+kubectl get pods -n wordpress
+Check the services:
+kubectl get svc -n wordpress
+
+---
+
+Step 8: Access WordPress
+Since we used NodePort, get the WordPress service URL:
+minikube service wordpress -n wordpress --url
+It will return a URL like http://192.168.49.2:30080. Open this URL in your browser and complete the WordPress installation.
+
+---
+
+Step 9: Cleanup (Optional)
+If you want to delete the deployment:
+kubectl delete namespace wordpress
+minikube stop
+
+---
+
+Conclusion
+Congratulations! 🎉 You have successfully deployed WordPress on Kubernetes Minikube using Docker images of WordPress and MySQL. This setup helps in testing WordPress in a containerized environment before deploying it on production Kubernetes clusters.
+If you found this guide helpful, feel free to share and follow for more Kubernetes tutorials! 🚀
