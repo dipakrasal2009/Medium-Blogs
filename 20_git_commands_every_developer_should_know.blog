@@ -1,0 +1,148 @@
+Mastering Git: Top 20 Git Commands Every Developer Should Know
+--------------------------------------------------------------
+
+Git & GitHub have become essential skills for developers, making version control and collaboration seamless. Whether you're a beginner or an experienced developer, these Git commands will be your go-to for managing repositories effectively. In this blog, we'll explore the Top 20 Git Commands that are frequently used in day-to-day development.
+
+---
+
+1. git config
+This command sets the author name and email address for commits.
+# Set your name
+git config --global user.name "Your Name"
+
+# Set your email
+git config --global user.email "your.email@example.com"
+
+---
+
+2. git init
+This command initializes a new Git repository.
+git init [repository_name]
+
+---
+
+3. git clone
+Clone an existing repository from a remote URL.
+git clone [repository_url]
+
+---
+
+4. git add
+Adds files to the staging area.
+# Add a specific file
+git add [file_name]
+
+# Add all files
+git add .
+
+---
+
+5. git commit
+Records changes in the repository with a message.
+# Commit with a message
+git commit -m "Commit message"
+
+# Commit all changes
+git commit -a
+
+---
+
+6. git diff
+Displays differences between commits, branches, and working states.
+git diff
+git diff --staged
+git diff [branch1] [branch2]
+
+---
+
+7. git reset
+Undo changes in the working directory and commits.
+git reset [file]
+git reset [commit]
+git reset --hard [commit]
+
+---
+
+8. git status
+Shows the state of the working directory and staging area.
+git status
+
+---
+
+9. git rm
+Removes a file from the working directory and stages the deletion.
+git rm [file]
+
+---
+
+10. git log
+Displays the commit history of the repository.
+git log
+git log --oneline
+11. git show
+Displays metadata and content changes of a specific commit.
+git show [commit]
+
+---
+
+12. git tag
+Assigns a tag to a specific commit.
+git tag [commitID]
+
+---
+
+13. git branch
+Manages branches in the repository.
+git branch
+git branch [branch_name]
+git branch -d [branch_name]
+
+---
+
+14. git checkout
+Switches between branches.
+git checkout [branch_name]
+git checkout -b [branch_name]
+
+---
+
+15. git merge
+Merges the specified branch into the current branch.
+git merge [branch_name]
+16. git remote
+Manages connections to remote repositories.
+git remote add [variable_name] [remote_repository_URL]
+17. git push
+Pushes changes from the local repository to a remote repository.
+git push [remote_name] master
+git push --all [remote_name]
+git push [remote_name] :[branch_name]
+18. git pull
+Fetches changes from a remote repository and merges them.
+git pull [repository_URL]
+19. git stash
+Temporarily stores uncommitted changes.
+git stash save
+git stash pop
+git stash list
+git stash drop
+
+---
+
+20. git restore
+Restores modified or deleted files in the working directory.
+# Restore a specific file
+git restore [file_name]
+
+# Restore all files
+git restore .
+
+---
+
+Conclusion
+Mastering these Git commands will significantly improve your workflow and collaboration skills. Whether you're working on a small project or a large-scale application, knowing how to use Git effectively is a crucial skill in modern software development.
+Want to dive deeper? Explore more Git features and best practices to take your version control skills to the next level!
+
+---
+
+Follow me for more insights on Git, DevOps, and Cloud technologies! 🚀
