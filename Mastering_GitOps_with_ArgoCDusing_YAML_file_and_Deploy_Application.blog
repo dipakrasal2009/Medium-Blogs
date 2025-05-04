@@ -1,0 +1,229 @@
+
+
+----Mastering GitOps with Argo CD using YAML file and Deploy Application----
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+In the fast-paced world of cloud-native development, managing deployments efficiently and securely has become a top priority. That’s where Argo CD steps in — a Kubernetes-native tool that brings GitOps to life with seamless integration and automated deployment workflows.
+
+In this blog, I’ll walk you through what Argo CD and GitOps are, how they work together, how to install and use Argo CD in your Kubernetes cluster, and why it’s a game-changer for DevOps teams.
+
+What is Argo CD?
+Argo CD (short for Argo Continuous Delivery) is a declarative, GitOps-based continuous delivery tool for Kubernetes. Unlike traditional CI/CD tools that use push-based mechanisms, Argo CD adopts a pull-based approach. It monitors your Git repository and continuously ensures that the live state of your Kubernetes cluster matches the desired state described in Git.
+
+This approach offers greater visibility, traceability, and automation, ensuring your infrastructure is always up to date with the source of truth — your Git repository.
+
+What is GitOps?
+GitOps is a modern DevOps practice that uses Git as the single source of truth for infrastructure and application code. It extends the principles of Infrastructure as Code (IaC) to the entire deployment process.
+
+At its core:
+
+All infrastructure definitions are stored in Git
+Any change is made via Git commits and pull requests.
+An automated agent (like Argo CD) continuously syncs the actual state with the desired state.
+Think of it as “version control meets automation” for infrastructure, providing the benefits of:
+
+Full audit history
+Easy rollbacks
+Enhanced collaboration
+Safer deployments
+How Argo CD Enables GitOps
+Here’s how Argo CD makes GitOps a reality:
+
+1. Developers commit Kubernetes manifests to Git (e.g., Deployments, Services).
+
+2. Once a change is merged into the main branch, the CI pipeline handles image builds and tests.
+
+3. Argo CD watches the Git repo for changes.
+
+4. If a change is detected, Argo CD compares the current state in the cluster to the desired state in Git.
+
+5. If out of sync, Argo CD updates the cluster resources automatically.
+
+6. Argo CD continuously monitors the cluster and Git to ensure they’re always in sync.
+
+Installing Argo CD on Kubernetes
+Prerequisites: A running Kubernetes cluster (I’m using Minikube for this demo)
+
+1️⃣ Create a namespace
+kubectl create namespace argocd
+
+2️⃣ Install Argo CD
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+
+3️⃣ Verify installation
+kubectl get all -n argocd
+
+You’ll see several pods, services, deployments, and a statefulset created under the argocd namespace.
+
+Accessing Argo CD UI
+Step 1: Port Forward the Argo CD Server
+Use this command to forward port 8080 on your local machine to port 443 of the Argo CD server service:
+
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+Now, you can open the Argo CD UI in your browser using:
+
+https://localhost:8080
+
+Step 2: Retrieve Initial Admin Password
+To log in, you’ll need the admin password. It’s stored in a Kubernetes secret (argocd-initial-admin-secret):
+
+argocd admin initial-password -n argocd
+
+This command fetches the auto-generated password for the admin user.
+
+Then login ArgoCD
+Username : admin
+password : mRmB1nVUaQC5NDj5
+
+
+
+Deploying an App with Argo CD
+Let’s say you have a sample app running on Kubernetes, like my IP-viewer app.
+
+Deployment manifest and Service manifest:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-ip-viewer-app
+spec:
+  replicas: 8
+  selector:
+    matchLabels:
+      app: ip-app
+  template:
+    metadata:
+      labels:
+        app: ip-app
+    spec:
+      containers:
+        - name: ip-app
+          image: dipakrasal2009/ip-viewer:latest
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-ip-app1
+spec:
+  type: NodePort
+  selector:
+    app: ip-app
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080  # You can change this if nee
+      
+      
+Connecting Argo CD with Git Repository
+Here’s the Argo CD Application manifest to link your Git repository with the Kubernetes cluster:
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-argo-application
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/dipakrasal2009/DevOps-Projects.git
+    targetRevision: HEAD
+    path: menifest
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: myapp
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true
+      
+Breakdown
+🔹 apiVersion & kind
+apiVersion: argoproj.io/v1alpha1
+Specifies the API version for Argo CD resources.
+kind: Application
+Declares this is an Argo CD Application object.
+🔹 metadata
+name: myapp-argo-application
+The name of this Argo CD Application.
+namespace: argocd
+The Argo CD controller watches this namespace. Default for Argo CD is argocd.
+🔹 spec.project
+project: default
+Refers to the default Argo CD project (useful for multi-tenancy or permission scoping).
+🔹 spec.source
+This section tells Argo CD where to find your manifests:
+
+repoURL: Git repo URL containing your Kubernetes YAMLs.
+targetRevision: Git branch or tag to track. HEAD means latest commit on the default branch.
+path: Folder inside the repo where your manifests (.yaml files) are located. Here, it’s menifest.
+🔹 spec.destination
+This defines where to deploy the manifests:
+
+server: The Kubernetes API server URL. https://kubernetes.default.svc means deploy to the same cluster Argo CD is running in.
+namespace: myapp: Target namespace for the deployment. If it doesn't exist, it will be created automatically (due to CreateNamespace=true).
+🔹 spec.syncPolicy
+Controls how Argo CD synchronizes the Git repo with the cluster.
+
+➤ syncOptions
+
+CreateNamespace=true: Automatically creates the myapp namespace if it doesn't exist.
+➤ automated
+
+selfHeal: true: If someone manually changes the app in the cluster, Argo CD will revert it to match Git.
+prune: true: If something is deleted from Git, Argo CD will also delete it from the cluster.
+What Happens When You Apply This?
+Argo CD will monitor the DevOps-Projects.git repo.
+It will look inside the menifest directory.
+It will automatically sync and apply the Kubernetes manifests to the myapp namespace in your current cluster.
+If anything in the cluster diverges from the Git repo, Argo CD will fix it
+To apply this file use this command :
+
+kubectl apply -f application.yml
+
+It will create the application
+
+
+
+With this setup, Argo CD will automatically:
+
+Pull the latest changes from the Git repo
+Apply them to the myapp namespace
+Heal any drift (self-heal)
+Clean up deleted resources (prune)
+It will create one namespace named as myapp
+
+kubectl get ns
+
+kubectl get all -n myapp
+
+It will deploy one application od IP Viewer
+you can see it using service
+
+minikube service k8s-ip-app1 -n myapp
+
+
+Benefits of Using Argo CD
+✅ Developer Productivity
+No more manual deployments. Devs can focus on writing code while Argo CD handles delivery.
+
+✅ Compliance & Governance
+Centralized change management with Git as the source of truth ensures security and traceability.
+
+✅ Collaboration
+One repo, multiple teams, streamlined workflows. Everyone knows what’s going on.
+
+✅ Faster Releases
+Automated sync means reduced time-to-market and the ability to quickly respond to issues.
+
+Conclusion
+Argo CD makes GitOps simple and powerful. It brings automation, visibility, and confidence to Kubernetes deployments. Whether you’re a solo developer or part of a large DevOps team, adopting Argo CD can revolutionize your delivery pipeline.
+
+So go ahead — install it, try it out, and take your Kubernetes game to the next level!
